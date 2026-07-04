@@ -1,0 +1,405 @@
+models:
+  # NOTA ARQUITECTÓNICA: Sucursal debe ir primero en la migración porque
+  # User y Habitacion tienen FK hacia ella.
+  Sucursal:
+    nombre: string
+    direccion: string
+    ciudad: string
+    telefono: nullable string
+    email: nullable string unique
+    activa: boolean default:true
+    softdeletes: softDeletes
+    relationships:
+      hasMany: Habitacion, User
+
+  User:
+    # nullable → un admin global puede gestionar todas las sucursales sin pertenecer a una
+    sucursal_id: nullable id:sucursal
+    role: enum:admin,supervisor,camarera,enfermera default:camarera
+    activo: boolean default:true
+    relationships:
+      belongsTo: Sucursal
+
+  Habitacion:
+    sucursal_id: id:sucursal
+    # NOTA: único a nivel de (sucursal_id, numero) — unique compuesto debe
+    # agregarse manualmente en la migración generada por Blueprint.
+    numero: string
+    tipo: enum:individual,doble,suite
+    piso: unsignedInteger
+    capacidad: unsignedInteger default:1
+    estado: enum:disponible,ocupada,sucia,en_limpieza,limpia,inspeccionada,fuera_de_servicio default:disponible
+    nfc_tag_uid: nullable string unique
+    notas: nullable text
+    softdeletes: softDeletes
+    relationships:
+      belongsTo: Sucursal
+      hasMany: Estancia, TareaLimpieza, ReporteMantenimiento, VisitaHabitacion
+
+  # Residente es GLOBAL — no tiene sucursal_id directo.
+  # Su sucursal se determina a través de: Estancia → Habitacion → Sucursal.
+  # Esto permite traslados entre sucursales creando una nueva Estancia.
+  Residente:
+    nombre: string
+    apellidos: string
+    fecha_nacimiento: date
+    curp: nullable string unique
+    diagnostico: nullable text
+    alergias: nullable text
+    contacto_emergencia: string
+    telefono_emergencia: string
+    foto_path: nullable string
+    softdeletes: softDeletes
+    relationships:
+      hasMany: Estancia, VisitaHabitacion
+
+  Estancia:
+    residente_id: id:residente
+    habitacion_id: id:habitacion
+    fecha_ingreso: date
+    fecha_egreso: nullable date
+    estado: enum:activa,alta,traslado,fallecimiento default:activa
+    notas_medicas: nullable text
+    relationships:
+      belongsTo: Residente, Habitacion
+
+  RondaEnfermeria:
+    # sucursal derivada de: enfermera_id → User → sucursal_id
+    enfermera_id: id:user
+    turno: enum:matutino,vespertino,nocturno
+    fecha: date
+    hora_inicio_programada: time
+    hora_fin_programada: time
+    hora_inicio_real: nullable time
+    hora_fin_real: nullable time
+    estado: enum:pendiente,en_curso,completada,incompleta default:pendiente
+    notas: nullable text
+    relationships:
+      belongsTo: User
+      hasMany: VisitaHabitacion, AlertaRonda
+      hasOne: ReporteEnfermeria
+
+  VisitaHabitacion:
+    ronda_enfermeria_id: id:ronda_enfermeria
+    habitacion_id: id:habitacion
+    residente_id: id:residente
+    hora_programada: time
+    nfc_verificado: boolean default:false
+    nfc_escaneado_at: nullable datetime
+    estado: enum:pendiente,en_progreso,completada,omitida default:pendiente
+    notas: nullable text
+    relationships:
+      belongsTo: RondaEnfermeria, Habitacion, Residente
+      hasMany: ChecklistEnfermeriaItem
+
+  ChecklistEnfermeriaItem:
+    visita_habitacion_id: id:visita_habitacion
+    descripcion: string
+    completado: boolean default:false
+    valor: nullable string
+    orden: unsignedInteger default:0
+    relationships:
+      belongsTo: VisitaHabitacion
+
+  ReporteEnfermeria:
+    ronda_enfermeria_id: id:ronda_enfermeria
+    enfermera_id: id:user
+    incidencias: nullable text
+    observaciones: nullable text
+    firmado_at: nullable datetime
+    estado: enum:borrador,firmado default:borrador
+    relationships:
+      belongsTo: RondaEnfermeria
+
+  AlertaRonda:
+    ronda_enfermeria_id: id:ronda_enfermeria
+    visita_habitacion_id: nullable id:visita_habitacion
+    tipo: enum:visita_tardia,visita_omitida,turno_incompleto
+    atendido: boolean default:false
+    atendido_por_id: nullable id:user
+    relationships:
+      belongsTo: RondaEnfermeria
+
+  TareaLimpieza:
+    # sucursal derivada de: habitacion_id → Habitacion → sucursal_id
+    habitacion_id: id:habitacion
+    camarera_id: nullable id:user
+    supervisora_id: nullable id:user
+    tipo: enum:salida,estancia,profunda,llegada
+    prioridad: enum:baja,normal,alta,urgente default:normal
+    estado: enum:pendiente,en_progreso,completada,inspeccionada,rechazada default:pendiente
+    fecha_programada: date
+    hora_inicio: nullable time
+    hora_fin: nullable time
+    notas: nullable text
+    relationships:
+      belongsTo: Habitacion
+      hasMany: ChecklistItem, Inspeccion
+
+  ChecklistItem:
+    tarea_limpieza_id: id:tarea_limpieza
+    descripcion: string
+    completado: boolean default:false
+    orden: unsignedInteger default:0
+    relationships:
+      belongsTo: TareaLimpieza
+
+  Inspeccion:
+    tarea_limpieza_id: id:tarea_limpieza
+    supervisora_id: id:user
+    resultado: enum:aprobada,rechazada
+    puntaje: nullable unsignedInteger
+    notas: nullable text
+    relationships:
+      belongsTo: TareaLimpieza
+
+  ReporteMantenimiento:
+    # sucursal derivada de: habitacion_id → Habitacion → sucursal_id
+    habitacion_id: id:habitacion
+    reportado_por_id: id:user
+    descripcion: text
+    prioridad: enum:baja,normal,alta,urgente default:normal
+    estado: enum:pendiente,en_proceso,resuelto default:pendiente
+    foto_path: nullable string
+    notas_resolucion: nullable text
+    relationships:
+      belongsTo: Habitacion
+
+controllers:
+  Sucursal:
+    index:
+      query: all
+      respond: sucursales
+    store:
+      validate: nombre, direccion, ciudad, telefono, email
+      save: sucursal
+      respond: 201
+    show:
+      find: sucursal
+      respond: sucursal
+    update:
+      find: sucursal
+      validate: nombre, direccion, ciudad, telefono, email, activa
+      update: sucursal
+      respond: sucursal
+    destroy:
+      find: sucursal
+      delete: sucursal
+      respond: 204
+
+  Habitacion:
+    index:
+      query: all
+      respond: habitaciones
+    store:
+      validate: sucursal_id, numero, tipo, piso, capacidad, nfc_tag_uid, notas
+      save: habitacion
+      respond: 201
+    show:
+      find: habitacion
+      respond: habitacion
+    update:
+      find: habitacion
+      validate: numero, tipo, piso, capacidad, estado, nfc_tag_uid, notas
+      update: habitacion
+      respond: habitacion
+    destroy:
+      find: habitacion
+      delete: habitacion
+      respond: 204
+
+  Residente:
+    index:
+      query: all
+      respond: residentes
+    store:
+      validate: nombre, apellidos, fecha_nacimiento, curp, diagnostico, alergias, contacto_emergencia, telefono_emergencia, foto_path
+      save: residente
+      respond: 201
+    show:
+      find: residente
+      respond: residente
+    update:
+      find: residente
+      validate: nombre, apellidos, fecha_nacimiento, curp, diagnostico, alergias, contacto_emergencia, telefono_emergencia
+      update: residente
+      respond: residente
+    destroy:
+      find: residente
+      delete: residente
+      respond: 204
+
+  Estancia:
+    index:
+      query: all
+      respond: estancias
+    store:
+      validate: residente_id, habitacion_id, fecha_ingreso, notas_medicas
+      save: estancia
+      respond: 201
+    show:
+      find: estancia
+      respond: estancia
+    update:
+      find: estancia
+      validate: fecha_egreso, estado, notas_medicas
+      update: estancia
+      respond: estancia
+
+  RondaEnfermeria:
+    index:
+      query: all
+      respond: ronda_enformerias
+    store:
+      validate: enfermera_id, turno, fecha, hora_inicio_programada, hora_fin_programada
+      save: ronda_enfermeria
+      respond: 201
+    show:
+      find: ronda_enfermeria
+      respond: ronda_enfermeria
+    update:
+      find: ronda_enfermeria
+      validate: hora_inicio_real, hora_fin_real, estado, notas
+      update: ronda_enfermeria
+      respond: ronda_enfermeria
+    destroy:
+      find: ronda_enfermeria
+      delete: ronda_enfermeria
+      respond: 204
+
+  VisitaHabitacion:
+    index:
+      query: all
+      respond: visita_habitaciones
+    store:
+      validate: ronda_enfermeria_id, habitacion_id, residente_id, hora_programada
+      save: visita_habitacion
+      respond: 201
+    show:
+      find: visita_habitacion
+      respond: visita_habitacion
+    update:
+      find: visita_habitacion
+      validate: estado, notas
+      update: visita_habitacion
+      respond: visita_habitacion
+
+  ChecklistEnfermeriaItem:
+    index:
+      query: all
+      respond: checklist_enfermeria_items
+    store:
+      validate: visita_habitacion_id, descripcion, orden
+      save: checklist_enfermeria_item
+      respond: 201
+    update:
+      find: checklist_enfermeria_item
+      validate: completado, valor, descripcion
+      update: checklist_enfermeria_item
+      respond: checklist_enfermeria_item
+    destroy:
+      find: checklist_enfermeria_item
+      delete: checklist_enfermeria_item
+      respond: 204
+
+  ReporteEnfermeria:
+    index:
+      query: all
+      respond: reporte_enformerias
+    store:
+      validate: ronda_enfermeria_id, incidencias, observaciones
+      save: reporte_enfermeria
+      respond: 201
+    show:
+      find: reporte_enfermeria
+      respond: reporte_enfermeria
+    update:
+      find: reporte_enfermeria
+      validate: incidencias, observaciones, estado
+      update: reporte_enfermeria
+      respond: reporte_enfermeria
+
+  AlertaRonda:
+    index:
+      query: all
+      respond: alerta_rondas
+    show:
+      find: alerta_ronda
+      respond: alerta_ronda
+    update:
+      find: alerta_ronda
+      validate: atendido
+      update: alerta_ronda
+      respond: alerta_ronda
+
+  TareaLimpieza:
+    index:
+      query: all
+      respond: tarea_limpiezas
+    store:
+      validate: habitacion_id, camarera_id, supervisora_id, tipo, prioridad, fecha_programada, notas
+      save: tarea_limpieza
+      respond: 201
+    show:
+      find: tarea_limpieza
+      respond: tarea_limpieza
+    update:
+      find: tarea_limpieza
+      validate: camarera_id, supervisora_id, prioridad, estado, fecha_programada, hora_inicio, hora_fin, notas
+      update: tarea_limpieza
+      respond: tarea_limpieza
+    destroy:
+      find: tarea_limpieza
+      delete: tarea_limpieza
+      respond: 204
+
+  ChecklistItem:
+    index:
+      query: all
+      respond: checklist_items
+    store:
+      validate: tarea_limpieza_id, descripcion, orden
+      save: checklist_item
+      respond: 201
+    update:
+      find: checklist_item
+      validate: completado, descripcion, orden
+      update: checklist_item
+      respond: checklist_item
+    destroy:
+      find: checklist_item
+      delete: checklist_item
+      respond: 204
+
+  Inspeccion:
+    index:
+      query: all
+      respond: inspecciones
+    store:
+      validate: tarea_limpieza_id, resultado, puntaje, notas
+      save: inspeccion
+      respond: 201
+    show:
+      find: inspeccion
+      respond: inspeccion
+
+  ReporteMantenimiento:
+    index:
+      query: all
+      respond: reporte_mantenimientos
+    store:
+      validate: habitacion_id, descripcion, prioridad, foto_path
+      save: reporte_mantenimiento
+      respond: 201
+    show:
+      find: reporte_mantenimiento
+      respond: reporte_mantenimiento
+    update:
+      find: reporte_mantenimiento
+      validate: estado, notas_resolucion, prioridad
+      update: reporte_mantenimiento
+      respond: reporte_mantenimiento
+    destroy:
+      find: reporte_mantenimiento
+      delete: reporte_mantenimiento
+      respond: 204

@@ -1,3 +1,49 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Application
+
+**Ama de Llaves** is a nursing home management REST API built with Laravel 13. It exposes a JSON:API-compliant interface at `/api/v1` and uses Passport OAuth2 for authentication.
+
+## Architecture
+
+### JSON:API (`laravel-json-api/laravel`)
+The API server is defined in `app/JsonApi/V1/Server.php` (base URI `/api/v1`). Each resource requires:
+- A Schema class at `app/JsonApi/V1/{Resource}/{Resource}Schema.php`
+- Registration in `Server::allSchemas()`
+- Routes mounted via `JsonApiRoute::server('v1')` in `routes/api.php`
+
+### Authentication (Passport)
+- Auth guard `api` uses Passport — see `config/auth.php`
+- In API controllers, use `$request->user()` instead of `auth()->id()` to respect the Passport guard
+- In Pest tests, call `Passport::actingAs($user, ['scope'])` inside each individual test method, not in `beforeEach`
+
+### Code Generation (Blueprint)
+`laravel-shift/blueprint` is installed. Run `vendor/bin/sail artisan blueprint:build` after placing a draft YAML in the project root.
+
+**Known Blueprint v2.13 bugs — always fix after generation:**
+- Spanish model names get latinized (wrong casing/accents stripped)
+- Route model binding parameters don't match Spanish resource names — add `->parameters([...])` to each `Route::apiResource()` call in `routes/api.php`
+- Blueprint may write API routes into `routes/web.php` instead of `routes/api.php` — verify and move them
+- `exists:` rules in Form Requests must use lowercase snake_case table names (MySQL in Sail/Docker is case-sensitive: `lower_case_table_names=0`)
+
+## Key Commands
+
+```bash
+# Run all tests
+vendor/bin/sail artisan test --compact
+
+# Run a single test by name
+vendor/bin/sail artisan test --compact --filter=TestName
+
+# Scaffold from Blueprint draft
+vendor/bin/sail artisan blueprint:build
+
+# Inspect API routes
+vendor/bin/sail artisan route:list --path=api --except-vendor
+```
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

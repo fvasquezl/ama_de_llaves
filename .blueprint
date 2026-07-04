@@ -1,0 +1,110 @@
+created:
+    - app/Http/Controllers/SucursalController.php
+    - app/Http/Controllers/HabitacionController.php
+    - app/Http/Controllers/ResidenteController.php
+    - app/Http/Controllers/EstanciaController.php
+    - app/Http/Controllers/RondaEnfermeriaController.php
+    - app/Http/Controllers/VisitaHabitacionController.php
+    - app/Http/Controllers/ChecklistEnfermeriaItemController.php
+    - app/Http/Controllers/ReporteEnfermeriaController.php
+    - app/Http/Controllers/AlertaRondaController.php
+    - app/Http/Controllers/TareaLimpiezaController.php
+    - app/Http/Controllers/ChecklistItemController.php
+    - app/Http/Controllers/InspeccionController.php
+    - app/Http/Controllers/ReporteMantenimientoController.php
+    - database/factories/SucursalFactory.php
+    - database/factories/UserFactory.php
+    - database/factories/HabitacionFactory.php
+    - database/factories/ResidenteFactory.php
+    - database/factories/EstanciaFactory.php
+    - database/factories/RondaEnfermeriaFactory.php
+    - database/factories/VisitaHabitacionFactory.php
+    - database/factories/ChecklistEnfermeriaItemFactory.php
+    - database/factories/ReporteEnfermeriaFactory.php
+    - database/factories/AlertaRondaFactory.php
+    - database/factories/TareaLimpiezaFactory.php
+    - database/factories/ChecklistItemFactory.php
+    - database/factories/InspeccionFactory.php
+    - database/factories/ReporteMantenimientoFactory.php
+    - database/migrations/2026_07_04_061518_create_sucursals_table.php
+    - database/migrations/2026_07_04_061519_create_users_table.php
+    - database/migrations/2026_07_04_061520_create_habitacions_table.php
+    - database/migrations/2026_07_04_061521_create_residentes_table.php
+    - database/migrations/2026_07_04_061522_create_estancias_table.php
+    - database/migrations/2026_07_04_061523_create_ronda_enfermerias_table.php
+    - database/migrations/2026_07_04_061524_create_visita_habitacions_table.php
+    - database/migrations/2026_07_04_061525_create_checklist_enfermeria_items_table.php
+    - database/migrations/2026_07_04_061526_create_reporte_enfermerias_table.php
+    - database/migrations/2026_07_04_061527_create_alerta_rondas_table.php
+    - database/migrations/2026_07_04_061528_create_tarea_limpiezas_table.php
+    - database/migrations/2026_07_04_061529_create_checklist_items_table.php
+    - database/migrations/2026_07_04_061530_create_inspeccions_table.php
+    - database/migrations/2026_07_04_061531_create_reporte_mantenimientos_table.php
+    - app/Models/Sucursal.php
+    - app/Models/User.php
+    - app/Models/Habitacion.php
+    - app/Models/Residente.php
+    - app/Models/Estancia.php
+    - app/Models/RondaEnfermeria.php
+    - app/Models/VisitaHabitacion.php
+    - app/Models/ChecklistEnfermeriaItem.php
+    - app/Models/ReporteEnfermeria.php
+    - app/Models/AlertaRonda.php
+    - app/Models/TareaLimpieza.php
+    - app/Models/ChecklistItem.php
+    - app/Models/Inspeccion.php
+    - app/Models/ReporteMantenimiento.php
+    - tests/Feature/Http/Controllers/SucursalControllerTest.php
+    - tests/Feature/Http/Controllers/HabitacionControllerTest.php
+    - tests/Feature/Http/Controllers/ResidenteControllerTest.php
+    - tests/Feature/Http/Controllers/EstanciaControllerTest.php
+    - tests/Feature/Http/Controllers/RondaEnfermeriaControllerTest.php
+    - tests/Feature/Http/Controllers/VisitaHabitacionControllerTest.php
+    - tests/Feature/Http/Controllers/ChecklistEnfermeriaItemControllerTest.php
+    - tests/Feature/Http/Controllers/ReporteEnfermeriaControllerTest.php
+    - tests/Feature/Http/Controllers/AlertaRondaControllerTest.php
+    - tests/Feature/Http/Controllers/TareaLimpiezaControllerTest.php
+    - tests/Feature/Http/Controllers/ChecklistItemControllerTest.php
+    - tests/Feature/Http/Controllers/InspeccionControllerTest.php
+    - tests/Feature/Http/Controllers/ReporteMantenimientoControllerTest.php
+    - app/Http/Requests/SucursalStoreRequest.php
+    - app/Http/Requests/SucursalUpdateRequest.php
+    - app/Http/Requests/HabitacionStoreRequest.php
+    - app/Http/Requests/HabitacionUpdateRequest.php
+    - app/Http/Requests/ResidenteStoreRequest.php
+    - app/Http/Requests/ResidenteUpdateRequest.php
+    - app/Http/Requests/EstanciumStoreRequest.php
+    - app/Http/Requests/EstanciumUpdateRequest.php
+    - app/Http/Requests/RondaEnfermeriumStoreRequest.php
+    - app/Http/Requests/RondaEnfermeriumUpdateRequest.php
+    - app/Http/Requests/VisitaHabitacionStoreRequest.php
+    - app/Http/Requests/VisitaHabitacionUpdateRequest.php
+    - app/Http/Requests/ChecklistEnfermeriaItemStoreRequest.php
+    - app/Http/Requests/ChecklistEnfermeriaItemUpdateRequest.php
+    - app/Http/Requests/ReporteEnfermeriumStoreRequest.php
+    - app/Http/Requests/ReporteEnfermeriumUpdateRequest.php
+    - app/Http/Requests/AlertaRondaUpdateRequest.php
+    - app/Http/Requests/TareaLimpiezaStoreRequest.php
+    - app/Http/Requests/TareaLimpiezaUpdateRequest.php
+    - app/Http/Requests/ChecklistItemStoreRequest.php
+    - app/Http/Requests/ChecklistItemUpdateRequest.php
+    - app/Http/Requests/InspeccionStoreRequest.php
+    - app/Http/Requests/ReporteMantenimientoStoreRequest.php
+    - app/Http/Requests/ReporteMantenimientoUpdateRequest.php
+updated:
+    - routes/web.php
+models:
+    Sucursal: { nombre: string, direccion: string, ciudad: string, telefono: 'nullable string', email: 'nullable string unique', activa: 'boolean default:true', softdeletes: softDeletes, relationships: { hasMany: 'Habitacion, User' } }
+    User: { sucursal_id: 'nullable id:sucursal', is_super_admin: 'boolean default:false', activo: 'boolean default:true', relationships: { belongsTo: Sucursal } }
+    Habitacion: { sucursal_id: 'id:sucursal', numero: string, tipo: 'enum:individual,doble,suite', piso: unsignedInteger, capacidad: 'unsignedInteger default:1', estado: 'enum:disponible,ocupada,sucia,en_limpieza,limpia,inspeccionada,fuera_de_servicio default:disponible', nfc_tag_uid: 'nullable string unique', notas: 'nullable text', softdeletes: softDeletes, relationships: { belongsTo: Sucursal, hasMany: 'Estancia, TareaLimpieza, ReporteMantenimiento, VisitaHabitacion' } }
+    Residente: { nombre: string, apellidos: string, fecha_nacimiento: date, curp: 'nullable string unique', diagnostico: 'nullable text', alergias: 'nullable text', contacto_emergencia: string, telefono_emergencia: string, foto_path: 'nullable string', softdeletes: softDeletes, relationships: { hasMany: 'Estancia, VisitaHabitacion' } }
+    Estancia: { residente_id: 'id:residente', habitacion_id: 'id:habitacion', fecha_ingreso: date, fecha_egreso: 'nullable date', estado: 'enum:activa,alta,traslado,fallecimiento default:activa', notas_medicas: 'nullable text', relationships: { belongsTo: 'Residente, Habitacion' } }
+    RondaEnfermeria: { enfermera_id: 'id:user', turno: 'enum:matutino,vespertino,nocturno', fecha: date, hora_inicio_programada: time, hora_fin_programada: time, hora_inicio_real: 'nullable time', hora_fin_real: 'nullable time', estado: 'enum:pendiente,en_curso,completada,incompleta default:pendiente', notas: 'nullable text', relationships: { belongsTo: User, hasMany: 'VisitaHabitacion, AlertaRonda', hasOne: ReporteEnfermeria } }
+    VisitaHabitacion: { ronda_enfermeria_id: 'id:ronda_enfermeria', habitacion_id: 'id:habitacion', residente_id: 'id:residente', hora_programada: time, nfc_verificado: 'boolean default:false', nfc_escaneado_at: 'nullable datetime', estado: 'enum:pendiente,en_progreso,completada,omitida default:pendiente', notas: 'nullable text', relationships: { belongsTo: 'RondaEnfermeria, Habitacion, Residente', hasMany: ChecklistEnfermeriaItem } }
+    ChecklistEnfermeriaItem: { visita_habitacion_id: 'id:visita_habitacion', descripcion: string, completado: 'boolean default:false', valor: 'nullable string', orden: 'unsignedInteger default:0', relationships: { belongsTo: VisitaHabitacion } }
+    ReporteEnfermeria: { ronda_enfermeria_id: 'id:ronda_enfermeria', enfermera_id: 'id:user', incidencias: 'nullable text', observaciones: 'nullable text', firmado_at: 'nullable datetime', estado: 'enum:borrador,firmado default:borrador', relationships: { belongsTo: RondaEnfermeria } }
+    AlertaRonda: { ronda_enfermeria_id: 'id:ronda_enfermeria', visita_habitacion_id: 'nullable id:visita_habitacion', tipo: 'enum:visita_tardia,visita_omitida,turno_incompleto', atendido: 'boolean default:false', atendido_por_id: 'nullable id:user', relationships: { belongsTo: RondaEnfermeria } }
+    TareaLimpieza: { habitacion_id: 'id:habitacion', camarera_id: 'nullable id:user', supervisora_id: 'nullable id:user', tipo: 'enum:salida,estancia,profunda,llegada', prioridad: 'enum:baja,normal,alta,urgente default:normal', estado: 'enum:pendiente,en_progreso,completada,inspeccionada,rechazada default:pendiente', fecha_programada: date, hora_inicio: 'nullable time', hora_fin: 'nullable time', notas: 'nullable text', relationships: { belongsTo: Habitacion, hasMany: 'ChecklistItem, Inspeccion' } }
+    ChecklistItem: { tarea_limpieza_id: 'id:tarea_limpieza', descripcion: string, completado: 'boolean default:false', orden: 'unsignedInteger default:0', relationships: { belongsTo: TareaLimpieza } }
+    Inspeccion: { tarea_limpieza_id: 'id:tarea_limpieza', supervisora_id: 'id:user', resultado: 'enum:aprobada,rechazada', puntaje: 'nullable unsignedInteger', notas: 'nullable text', relationships: { belongsTo: TareaLimpieza } }
+    ReporteMantenimiento: { habitacion_id: 'id:habitacion', reportado_por_id: 'id:user', descripcion: text, prioridad: 'enum:baja,normal,alta,urgente default:normal', estado: 'enum:pendiente,en_proceso,resuelto default:pendiente', foto_path: 'nullable string', notas_resolucion: 'nullable text', relationships: { belongsTo: Habitacion } }

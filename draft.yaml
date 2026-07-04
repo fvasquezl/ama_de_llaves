@@ -15,7 +15,7 @@ models:
   User:
     # nullable → un admin global puede gestionar todas las sucursales sin pertenecer a una
     sucursal_id: nullable id:sucursal
-    role: enum:admin,supervisor,camarera,enfermera default:camarera
+    is_super_admin: boolean default:false
     activo: boolean default:true
     relationships:
       belongsTo: Sucursal

@@ -26,29 +26,65 @@ it('crea los roles con los nombres correctos', function () {
         ->toBe(['admin', 'camarera', 'enfermera', 'supervisor']);
 });
 
-it('el rol admin tiene 31 permisos', function () {
-    expect(Role::findByName('admin', 'api')->permissions()->count())->toBe(31);
+it('el rol admin tiene 39 permisos', function () {
+    expect(Role::findByName('admin', 'api')->permissions()->count())->toBe(39);
 });
 
-it('el rol supervisor tiene 16 permisos', function () {
-    expect(Role::findByName('supervisor', 'api')->permissions()->count())->toBe(16);
+it('el rol supervisor tiene 30 permisos', function () {
+    expect(Role::findByName('supervisor', 'api')->permissions()->count())->toBe(30);
 });
 
 it('el rol camarera tiene 6 permisos', function () {
     expect(Role::findByName('camarera', 'api')->permissions()->count())->toBe(6);
 });
 
-it('el rol enfermera tiene 16 permisos', function () {
-    expect(Role::findByName('enfermera', 'api')->permissions()->count())->toBe(16);
+it('el rol enfermera tiene 17 permisos', function () {
+    expect(Role::findByName('enfermera', 'api')->permissions()->count())->toBe(17);
 });
 
-it('el rol admin puede eliminar habitaciones pero no crear rondas de enfermeria', function () {
+it('el rol admin puede eliminar habitaciones y crear rondas de enfermeria', function () {
     $admin = Role::findByName('admin', 'api');
     $permisos = $admin->permissions->pluck('name');
 
     expect($permisos)->toContain('habitaciones.eliminar')
         ->and($permisos)->toContain('usuarios.crear')
-        ->and($permisos)->not->toContain('rondas-enfermeria.crear');
+        ->and($permisos)->toContain('rondas-enfermeria.crear');
+});
+
+it('el rol admin tiene ver, crear y editar en los 5 grupos de permisos de enfermeria', function () {
+    $admin = Role::findByName('admin', 'api');
+    $permisos = $admin->permissions->pluck('name');
+
+    foreach (['rondas-enfermeria', 'visitas-habitacion', 'checklist-enfermeria', 'reportes-enfermeria'] as $grupo) {
+        expect($permisos)->toContain("{$grupo}.ver")
+            ->and($permisos)->toContain("{$grupo}.crear")
+            ->and($permisos)->toContain("{$grupo}.editar");
+    }
+
+    expect($permisos)->toContain('alertas-ronda.ver')
+        ->and($permisos)->toContain('alertas-ronda.editar');
+});
+
+it('el rol supervisor tiene ver, crear y editar en los 5 grupos de permisos de enfermeria', function () {
+    $supervisor = Role::findByName('supervisor', 'api');
+    $permisos = $supervisor->permissions->pluck('name');
+
+    foreach (['rondas-enfermeria', 'visitas-habitacion', 'checklist-enfermeria', 'reportes-enfermeria'] as $grupo) {
+        expect($permisos)->toContain("{$grupo}.ver")
+            ->and($permisos)->toContain("{$grupo}.crear")
+            ->and($permisos)->toContain("{$grupo}.editar");
+    }
+
+    expect($permisos)->toContain('alertas-ronda.ver')
+        ->and($permisos)->toContain('alertas-ronda.editar');
+});
+
+it('el rol enfermera tiene alertas-ronda.editar ademas de alertas-ronda.ver', function () {
+    $enfermera = Role::findByName('enfermera', 'api');
+    $permisos = $enfermera->permissions->pluck('name');
+
+    expect($permisos)->toContain('alertas-ronda.ver')
+        ->and($permisos)->toContain('alertas-ronda.editar');
 });
 
 it('el rol enfermera puede gestionar rondas pero no tareas de limpieza', function () {

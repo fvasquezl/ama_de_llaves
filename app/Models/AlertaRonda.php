@@ -29,7 +29,7 @@ class AlertaRonda extends Model
             'ronda_enfermeria_id' => 'integer',
             'visita_habitacion_id' => 'integer',
             'atendido' => 'boolean',
-            'atendido_por_id' => 'integer',
+            'atendido_por_id' => 'string',
         ];
     }
 

@@ -28,15 +28,9 @@ class RondaEnfermeria extends Model
     {
         return [
             'id' => 'integer',
-            'enfermera_id' => 'integer',
+            'enfermera_id' => 'string',
             'fecha' => 'date',
-            'user_id' => 'integer',
         ];
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 
     public function enfermera(): BelongsTo

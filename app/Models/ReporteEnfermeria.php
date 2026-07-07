@@ -27,7 +27,7 @@ class ReporteEnfermeria extends Model
         return [
             'id' => 'integer',
             'ronda_enfermeria_id' => 'integer',
-            'enfermera_id' => 'integer',
+            'enfermera_id' => 'string',
             'firmado_at' => 'datetime',
         ];
     }

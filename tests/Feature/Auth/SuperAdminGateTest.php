@@ -59,7 +59,7 @@ it('camarera solo puede realizar las acciones asignadas a su rol', function () {
         ->and(Gate::forUser($user)->denies('residentes.ver'))->toBeTrue();
 });
 
-it('supervisor puede gestionar limpieza pero no enfermeria', function () {
+it('supervisor puede gestionar limpieza y enfermeria pero no crear residentes', function () {
     $user = User::factory()->create(['is_super_admin' => false]);
     $user->assignRole('supervisor');
 
@@ -67,11 +67,12 @@ it('supervisor puede gestionar limpieza pero no enfermeria', function () {
 
     expect(Gate::forUser($user)->allows('tareas-limpieza.ver'))->toBeTrue()
         ->and(Gate::forUser($user)->allows('inspecciones.crear'))->toBeTrue()
-        ->and(Gate::forUser($user)->denies('rondas-enfermeria.ver'))->toBeTrue()
+        ->and(Gate::forUser($user)->allows('rondas-enfermeria.ver'))->toBeTrue()
+        ->and(Gate::forUser($user)->allows('rondas-enfermeria.crear'))->toBeTrue()
         ->and(Gate::forUser($user)->denies('residentes.crear'))->toBeTrue();
 });
 
-it('admin puede gestionar usuarios y habitaciones pero no crear rondas', function () {
+it('admin puede gestionar usuarios, habitaciones y crear rondas', function () {
     $user = User::factory()->create(['is_super_admin' => false]);
     $user->assignRole('admin');
 
@@ -79,5 +80,5 @@ it('admin puede gestionar usuarios y habitaciones pero no crear rondas', functio
 
     expect(Gate::forUser($user)->allows('usuarios.crear'))->toBeTrue()
         ->and(Gate::forUser($user)->allows('habitaciones.eliminar'))->toBeTrue()
-        ->and(Gate::forUser($user)->denies('rondas-enfermeria.crear'))->toBeTrue();
+        ->and(Gate::forUser($user)->allows('rondas-enfermeria.crear'))->toBeTrue();
 });

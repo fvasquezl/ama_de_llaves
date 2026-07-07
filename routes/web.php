@@ -1,18 +1,13 @@
 <?php
 
-use App\Http\Controllers\AlertaRondaController;
-use App\Http\Controllers\ChecklistEnfermeriaItemController;
 use App\Http\Controllers\ChecklistItemController;
 use App\Http\Controllers\EstanciaController;
 use App\Http\Controllers\HabitacionController;
 use App\Http\Controllers\InspeccionController;
-use App\Http\Controllers\ReporteEnfermeriaController;
 use App\Http\Controllers\ReporteMantenimientoController;
 use App\Http\Controllers\ResidenteController;
-use App\Http\Controllers\RondaEnfermeriaController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\TareaLimpiezaController;
-use App\Http\Controllers\VisitaHabitacionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,16 +21,6 @@ Route::resource('habitacions', HabitacionController::class)->except('create', 'e
 Route::resource('residentes', ResidenteController::class)->except('create', 'edit');
 
 Route::resource('estancias', EstanciaController::class)->except('create', 'edit', 'destroy');
-
-Route::resource('ronda-enfermerias', RondaEnfermeriaController::class)->except('create', 'edit');
-
-Route::resource('visita-habitacions', VisitaHabitacionController::class)->except('create', 'edit', 'destroy');
-
-Route::resource('checklist-enfermeria-items', ChecklistEnfermeriaItemController::class)->except('create', 'edit', 'show');
-
-Route::resource('reporte-enfermerias', ReporteEnfermeriaController::class)->except('create', 'edit', 'destroy');
-
-Route::resource('alerta-rondas', AlertaRondaController::class)->only('index', 'show', 'update');
 
 Route::resource('tarea-limpiezas', TareaLimpiezaController::class)->except('create', 'edit');
 

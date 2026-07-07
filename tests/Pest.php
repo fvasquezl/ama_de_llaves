@@ -48,3 +48,15 @@ function something()
 {
     // ..
 }
+
+/**
+ * Standard Accept/Content-Type headers for laravel-json-api requests.
+ * Without both, requests get rejected as an unsupported media type.
+ */
+function jsonApiHeaders(): array
+{
+    return [
+        'Accept' => 'application/vnd.api+json',
+        'Content-Type' => 'application/vnd.api+json',
+    ];
+}

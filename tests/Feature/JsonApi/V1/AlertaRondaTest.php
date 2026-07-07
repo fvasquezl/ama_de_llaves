@@ -5,6 +5,7 @@ use App\Models\RondaEnfermeria;
 use App\Models\User;
 use App\Models\VisitaHabitacion;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 
@@ -33,8 +34,27 @@ it('lists only alerts belonging to the authenticated enfermeras own rounds', fun
     $rondaA = RondaEnfermeria::factory()->create(['enfermera_id' => $enfermeraA->id]);
     $rondaB = RondaEnfermeria::factory()->create(['enfermera_id' => $enfermeraB->id]);
 
-    AlertaRonda::factory()->count(2)->create(['ronda_enfermeria_id' => $rondaA->id, 'visita_habitacion_id' => null]);
-    AlertaRonda::factory()->count(3)->create(['ronda_enfermeria_id' => $rondaB->id, 'visita_habitacion_id' => null]);
+    // Pin distinct `tipo` values per row (via a Sequence) rather than
+    // relying on the factory's random default: at most one
+    // `turno_incompleto` alert is allowed per ronda (unique constraint),
+    // so letting Faker pick `tipo` independently for each row risks a
+    // flaky duplicate-key violation whenever 2+ rows under the same ronda
+    // happen to land on `turno_incompleto`.
+    AlertaRonda::factory()
+        ->count(2)
+        ->state(new Sequence(
+            ['tipo' => 'visita_tardia'],
+            ['tipo' => 'visita_omitida'],
+        ))
+        ->create(['ronda_enfermeria_id' => $rondaA->id, 'visita_habitacion_id' => null]);
+    AlertaRonda::factory()
+        ->count(3)
+        ->state(new Sequence(
+            ['tipo' => 'visita_tardia'],
+            ['tipo' => 'visita_omitida'],
+            ['tipo' => 'turno_incompleto'],
+        ))
+        ->create(['ronda_enfermeria_id' => $rondaB->id, 'visita_habitacion_id' => null]);
     Passport::actingAs($enfermeraA, ['*']);
 
     $response = $this->getJson('/api/v1/alertas-ronda', jsonApiHeaders());

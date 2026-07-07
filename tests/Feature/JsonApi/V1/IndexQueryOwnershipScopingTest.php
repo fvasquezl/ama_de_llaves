@@ -7,6 +7,7 @@ use App\Models\RondaEnfermeria;
 use App\Models\User;
 use App\Models\VisitaHabitacion;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Server\Repository as ServerRepository;
@@ -132,8 +133,28 @@ it('scopes alertas-ronda via the one-hop chain rondaEnfermeria.enfermera_id', fu
     // `visita_habitacion_id` is nullable and irrelevant to this test; set
     // it explicitly to avoid cascading unrelated Habitacion/Residente
     // factory records (whose fake CURP values are not guaranteed unique).
-    AlertaRonda::factory()->count(2)->create(['ronda_enfermeria_id' => $rondaA->id, 'visita_habitacion_id' => null]);
-    AlertaRonda::factory()->count(3)->create(['ronda_enfermeria_id' => $rondaB->id, 'visita_habitacion_id' => null]);
+    //
+    // Pin distinct `tipo` values per row (via a Sequence) rather than
+    // relying on the factory's random default: at most one
+    // `turno_incompleto` alert is allowed per ronda (unique constraint),
+    // so letting Faker pick `tipo` independently for each row risks a
+    // flaky duplicate-key violation whenever 2+ rows under the same ronda
+    // happen to land on `turno_incompleto`.
+    AlertaRonda::factory()
+        ->count(2)
+        ->state(new Sequence(
+            ['tipo' => 'visita_tardia'],
+            ['tipo' => 'visita_omitida'],
+        ))
+        ->create(['ronda_enfermeria_id' => $rondaA->id, 'visita_habitacion_id' => null]);
+    AlertaRonda::factory()
+        ->count(3)
+        ->state(new Sequence(
+            ['tipo' => 'visita_tardia'],
+            ['tipo' => 'visita_omitida'],
+            ['tipo' => 'turno_incompleto'],
+        ))
+        ->create(['ronda_enfermeria_id' => $rondaB->id, 'visita_habitacion_id' => null]);
 
     $results = scopedIndexResults('alertas-ronda', $enfermeraA, AlertaRonda::query());
 

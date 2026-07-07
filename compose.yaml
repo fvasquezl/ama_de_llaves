@@ -23,6 +23,17 @@ services:
             - sail
         depends_on:
             - mysql
+    scheduler:
+        image: 'sail-8.5/app'
+        depends_on:
+            - mysql
+        environment:
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        entrypoint: ['php', 'artisan', 'schedule:work']
     mysql:
         image: 'mysql:8.4'
         ports:

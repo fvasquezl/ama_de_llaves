@@ -28,8 +28,8 @@ class TareaLimpieza extends Model
         return [
             'id' => 'integer',
             'habitacion_id' => 'integer',
-            'camarera_id' => 'integer',
-            'supervisora_id' => 'integer',
+            'camarera_id' => 'string',
+            'supervisora_id' => 'string',
             'fecha_programada' => 'date',
         ];
     }

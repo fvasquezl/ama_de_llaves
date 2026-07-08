@@ -27,7 +27,7 @@ class ReporteMantenimiento extends Model
         return [
             'id' => 'integer',
             'habitacion_id' => 'integer',
-            'reportado_por_id' => 'integer',
+            'reportado_por_id' => 'string',
         ];
     }
 

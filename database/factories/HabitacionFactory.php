@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Sucursal;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class HabitacionFactory extends Factory
 {
@@ -19,7 +20,7 @@ class HabitacionFactory extends Factory
             'piso' => fake()->randomNumber(),
             'capacidad' => fake()->randomNumber(),
             'estado' => fake()->randomElement(['disponible', 'ocupada', 'sucia', 'en_limpieza', 'limpia', 'inspeccionada', 'fuera_de_servicio']),
-            'nfc_tag_uid' => fake()->word(),
+            'nfc_tag_uid' => Str::upper(Str::random(14)),
             'notas' => fake()->text(),
         ];
     }

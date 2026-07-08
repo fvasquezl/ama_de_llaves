@@ -27,7 +27,7 @@ class Inspeccion extends Model
         return [
             'id' => 'integer',
             'tarea_limpieza_id' => 'integer',
-            'supervisora_id' => 'integer',
+            'supervisora_id' => 'string',
             'puntaje' => 'integer',
         ];
     }

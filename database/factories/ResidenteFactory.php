@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class ResidenteFactory extends Factory
 {
@@ -15,7 +16,7 @@ class ResidenteFactory extends Factory
             'nombre' => fake()->word(),
             'apellidos' => fake()->word(),
             'fecha_nacimiento' => fake()->date(),
-            'curp' => fake()->word(),
+            'curp' => Str::upper(Str::random(18)),
             'diagnostico' => fake()->text(),
             'alergias' => fake()->text(),
             'contacto_emergencia' => fake()->word(),

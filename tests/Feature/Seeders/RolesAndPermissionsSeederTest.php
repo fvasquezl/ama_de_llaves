@@ -26,20 +26,20 @@ it('crea los roles con los nombres correctos', function () {
         ->toBe(['admin', 'camarera', 'enfermera', 'supervisor']);
 });
 
-it('el rol admin tiene 39 permisos', function () {
-    expect(Role::findByName('admin', 'api')->permissions()->count())->toBe(39);
+it('el rol admin tiene 43 permisos', function () {
+    expect(Role::findByName('admin', 'api')->permissions()->count())->toBe(43);
 });
 
-it('el rol supervisor tiene 30 permisos', function () {
-    expect(Role::findByName('supervisor', 'api')->permissions()->count())->toBe(30);
+it('el rol supervisor tiene 29 permisos', function () {
+    expect(Role::findByName('supervisor', 'api')->permissions()->count())->toBe(29);
 });
 
-it('el rol camarera tiene 6 permisos', function () {
-    expect(Role::findByName('camarera', 'api')->permissions()->count())->toBe(6);
+it('el rol camarera tiene 7 permisos', function () {
+    expect(Role::findByName('camarera', 'api')->permissions()->count())->toBe(7);
 });
 
-it('el rol enfermera tiene 17 permisos', function () {
-    expect(Role::findByName('enfermera', 'api')->permissions()->count())->toBe(17);
+it('el rol enfermera tiene 18 permisos', function () {
+    expect(Role::findByName('enfermera', 'api')->permissions()->count())->toBe(18);
 });
 
 it('el rol admin puede eliminar habitaciones y crear rondas de enfermeria', function () {
@@ -106,12 +106,52 @@ it('el rol camarera solo puede editar tareas no crearlas', function () {
         ->and($permisos)->not->toContain('tareas-limpieza.eliminar');
 });
 
-it('ningun rol tiene permisos de sucursales create o edit', function () {
-    $todosLosPermisos = Role::with('permissions')->get()
-        ->flatMap(fn ($role) => $role->permissions->pluck('name'))
-        ->unique();
+it('solo el rol admin tiene permisos de sucursales crear, editar y eliminar', function () {
+    $admin = Role::findByName('admin', 'api')->permissions->pluck('name');
+    expect($admin)->toContain('sucursales.crear')
+        ->and($admin)->toContain('sucursales.editar')
+        ->and($admin)->toContain('sucursales.eliminar');
 
-    expect($todosLosPermisos)->not->toContain('sucursales.crear')
-        ->and($todosLosPermisos)->not->toContain('sucursales.editar')
-        ->and($todosLosPermisos)->not->toContain('sucursales.eliminar');
+    foreach (['supervisor', 'camarera', 'enfermera'] as $roleName) {
+        $permisos = Role::findByName($roleName, 'api')->permissions->pluck('name');
+
+        expect($permisos)->not->toContain('sucursales.crear')
+            ->and($permisos)->not->toContain('sucursales.editar')
+            ->and($permisos)->not->toContain('sucursales.eliminar');
+    }
+});
+
+it('ningun rol tiene los permisos eliminar retirados de limpieza y mantenimiento', function () {
+    expect(Permission::where('name', 'tareas-limpieza.eliminar')->exists())->toBeFalse()
+        ->and(Permission::where('name', 'checklist-limpieza.eliminar')->exists())->toBeFalse()
+        ->and(Permission::where('name', 'reportes-mantenimiento.eliminar')->exists())->toBeFalse();
+
+    foreach (['admin', 'supervisor', 'camarera', 'enfermera'] as $roleName) {
+        $permisos = Role::findByName($roleName, 'api')->permissions->pluck('name');
+
+        expect($permisos)->not->toContain('tareas-limpieza.eliminar')
+            ->and($permisos)->not->toContain('checklist-limpieza.eliminar')
+            ->and($permisos)->not->toContain('reportes-mantenimiento.eliminar');
+    }
+});
+
+it('el rol admin tiene paridad con supervisor en checklist-limpieza e inspecciones', function () {
+    $admin = Role::findByName('admin', 'api')->permissions->pluck('name');
+
+    expect($admin)->toContain('checklist-limpieza.crear')
+        ->and($admin)->toContain('checklist-limpieza.editar')
+        ->and($admin)->toContain('inspecciones.crear');
+});
+
+it('el rol camarera puede ver los reportes de mantenimiento que crea', function () {
+    $camarera = Role::findByName('camarera', 'api')->permissions->pluck('name');
+
+    expect($camarera)->toContain('reportes-mantenimiento.ver')
+        ->and($camarera)->toContain('reportes-mantenimiento.crear');
+});
+
+it('el rol enfermera puede crear estancias', function () {
+    $enfermera = Role::findByName('enfermera', 'api')->permissions->pluck('name');
+
+    expect($enfermera)->toContain('estancias.crear');
 });

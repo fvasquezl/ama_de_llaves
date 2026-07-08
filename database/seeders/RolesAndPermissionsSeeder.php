@@ -21,6 +21,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'usuarios.crear',
             'usuarios.editar',
             'sucursales.ver',
+            'sucursales.crear',
+            'sucursales.editar',
+            'sucursales.eliminar',
 
             // Instalaciones
             'habitaciones.ver',
@@ -57,11 +60,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'tareas-limpieza.ver',
             'tareas-limpieza.crear',
             'tareas-limpieza.editar',
-            'tareas-limpieza.eliminar',
             'checklist-limpieza.ver',
             'checklist-limpieza.crear',
             'checklist-limpieza.editar',
-            'checklist-limpieza.eliminar',
             'inspecciones.ver',
             'inspecciones.crear',
 
@@ -69,7 +70,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'reportes-mantenimiento.ver',
             'reportes-mantenimiento.crear',
             'reportes-mantenimiento.editar',
-            'reportes-mantenimiento.eliminar',
         ];
 
         foreach ($permissions as $name) {
@@ -79,7 +79,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Role::create(['name' => 'admin', 'guard_name' => $guard])
             ->givePermissionTo([
                 'usuarios.ver', 'usuarios.crear', 'usuarios.editar',
-                'sucursales.ver',
+                'sucursales.ver', 'sucursales.crear', 'sucursales.editar', 'sucursales.eliminar',
                 'habitaciones.ver', 'habitaciones.crear', 'habitaciones.editar', 'habitaciones.eliminar',
                 'residentes.ver', 'residentes.crear', 'residentes.editar', 'residentes.eliminar',
                 'estancias.ver', 'estancias.crear', 'estancias.editar',
@@ -88,10 +88,10 @@ class RolesAndPermissionsSeeder extends Seeder
                 'checklist-enfermeria.ver', 'checklist-enfermeria.crear', 'checklist-enfermeria.editar',
                 'reportes-enfermeria.ver', 'reportes-enfermeria.crear', 'reportes-enfermeria.editar',
                 'alertas-ronda.ver', 'alertas-ronda.editar',
-                'tareas-limpieza.ver', 'tareas-limpieza.crear', 'tareas-limpieza.editar', 'tareas-limpieza.eliminar',
-                'checklist-limpieza.ver',
-                'inspecciones.ver',
-                'reportes-mantenimiento.ver', 'reportes-mantenimiento.crear', 'reportes-mantenimiento.editar', 'reportes-mantenimiento.eliminar',
+                'tareas-limpieza.ver', 'tareas-limpieza.crear', 'tareas-limpieza.editar',
+                'checklist-limpieza.ver', 'checklist-limpieza.crear', 'checklist-limpieza.editar',
+                'inspecciones.ver', 'inspecciones.crear',
+                'reportes-mantenimiento.ver', 'reportes-mantenimiento.crear', 'reportes-mantenimiento.editar',
             ]);
 
         Role::create(['name' => 'supervisor', 'guard_name' => $guard])
@@ -106,7 +106,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'reportes-enfermeria.ver', 'reportes-enfermeria.crear', 'reportes-enfermeria.editar',
                 'alertas-ronda.ver', 'alertas-ronda.editar',
                 'tareas-limpieza.ver', 'tareas-limpieza.crear', 'tareas-limpieza.editar',
-                'checklist-limpieza.ver', 'checklist-limpieza.crear', 'checklist-limpieza.editar', 'checklist-limpieza.eliminar',
+                'checklist-limpieza.ver', 'checklist-limpieza.crear', 'checklist-limpieza.editar',
                 'inspecciones.ver', 'inspecciones.crear',
                 'reportes-mantenimiento.ver', 'reportes-mantenimiento.crear', 'reportes-mantenimiento.editar',
             ]);
@@ -116,14 +116,14 @@ class RolesAndPermissionsSeeder extends Seeder
                 'habitaciones.ver',
                 'tareas-limpieza.ver', 'tareas-limpieza.editar',
                 'checklist-limpieza.ver', 'checklist-limpieza.editar',
-                'reportes-mantenimiento.crear',
+                'reportes-mantenimiento.ver', 'reportes-mantenimiento.crear',
             ]);
 
         Role::create(['name' => 'enfermera', 'guard_name' => $guard])
             ->givePermissionTo([
                 'habitaciones.ver',
                 'residentes.ver',
-                'estancias.ver',
+                'estancias.ver', 'estancias.crear',
                 'rondas-enfermeria.ver', 'rondas-enfermeria.crear', 'rondas-enfermeria.editar',
                 'visitas-habitacion.ver', 'visitas-habitacion.crear', 'visitas-habitacion.editar',
                 'checklist-enfermeria.ver', 'checklist-enfermeria.crear', 'checklist-enfermeria.editar',
